@@ -5,7 +5,9 @@ import numpy as np
 class Cropper:
 
     def __init__(self):
-        self.src = cv.imread("test.png", -1)
+        self.filename = "test.png"
+        self.extension = self.filename.split('.')[-1]
+        self.src = cv.imread(self.filename, -1)
 
         if len(self.src.shape) == 2:  # If the source image is gray scale
             self.temp = cv.cvtColor(self.src, cv.COLOR_GRAY2BGR)
@@ -19,7 +21,7 @@ class Cropper:
         if event == cv.EVENT_LBUTTONDOWN:
             print(x, y)
             self.points.append((x, y))
-            cv.circle(self.temp, center=(x, y), radius=25, color=(0, 0, 255), thickness=-1)
+            cv.circle(self.temp, center=(x, y), radius=10, color=(0, 0, 255), thickness=-1)
 
     def main(self):
         while True:
@@ -54,7 +56,14 @@ class Cropper:
             cv.imshow("output", dst)
             key = cv.waitKey(1) & 0xFF
             if key == ord("s"):  # 'S' to save
-                cv.imwrite("cropped.png", dst)
+                if self.extension == 'tif':
+                    cv.imwrite("cropped." + self.extension, dst, ((int(cv.IMWRITE_TIFF_RESUNIT), 2,
+                                                                   int(cv.IMWRITE_TIFF_COMPRESSION), 1,
+                                                                   int(cv.IMWRITE_TIFF_XDPI), 100,
+                                                                   int(cv.IMWRITE_TIFF_YDPI), 100)))
+                else:
+                    cv.imwrite("cropped." + self.extension, dst)
+
                 break
             elif key == ord("q"):  # 'Q' to quit
                 break
